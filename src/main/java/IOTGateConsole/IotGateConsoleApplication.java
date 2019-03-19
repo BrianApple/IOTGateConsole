@@ -4,18 +4,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import IOTGateConsole.remoting.RemoteClient;
+import IOTGateConsole.rpc.proxy.RPCRequestProxy;
+import IOTGateConsole.rpc.service.RPCExportService;
 
 @SpringBootApplication
 public class IotGateConsoleApplication {
 
 	public static void start(){
-		RemoteClient client = new RemoteClient();
-		try {
-			client.start("127.0.0.1", 10916);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		RPCExportService service = new RPCRequestProxy().create(RPCExportService.class) ;
+		service.test("你好rpc");
 	}
 	
 	public static void main(String[] args) {

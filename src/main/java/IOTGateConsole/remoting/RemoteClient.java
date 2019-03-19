@@ -2,6 +2,7 @@ package IOTGateConsole.remoting;
 
 import IOTGateConsole.codec.RpcDecoder;
 import IOTGateConsole.codec.RpcEncoder;
+import IOTGateConsole.databridge.RequestData;
 import IOTGateConsole.databridge.ResponseData;
 import IOTGateConsole.util.ThreadFactoryImpl;
 import io.netty.bootstrap.Bootstrap;
@@ -23,11 +24,13 @@ public class RemoteClient {
 	
 	private final Bootstrap bootstrap = new Bootstrap();
     private final EventLoopGroup eventLoopGroupWorker;
+    private final Object obj = new Object();
+    private ResponseData responseData = null;
 	public RemoteClient(){
 		eventLoopGroupWorker = new NioEventLoopGroup(1, new ThreadFactoryImpl("netty_rpc_client_", false));
 	}
 
-	public void start(String ip ,int port) throws InterruptedException{
+	public ResponseData start(String ip ,int port ,RequestData requestData) throws InterruptedException{
 		 Bootstrap handler = this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)//
 		            //
 		            .option(ChannelOption.TCP_NODELAY, true)
@@ -49,8 +52,18 @@ public class RemoteClient {
 		                        new NettyClientHandler());//获取数据
 		                }
 		            });
-		 ChannelFuture channelFuture=handler.connect(ip, port).sync();
-		 System.out.println("rpc客户端启动成功......");
+		ChannelFuture channelFuture=handler.connect(ip, port).sync();
+		channelFuture.channel().writeAndFlush(requestData).sync();
+		synchronized (obj) {
+			obj.wait();
+		}
+		 
+		 
+		System.out.println("rpc客户端启动成功......");
+		if (responseData != null) {
+			channelFuture.channel().closeFuture().sync();
+		}
+		return responseData;
 	}
 	
 	
@@ -105,7 +118,10 @@ public class RemoteClient {
         	/**
         	 * 调用的处理响应数据的方法
         	 */
-//            processMessageReceived(ctx, msg);
+        	RemoteClient.this.responseData = msg;
+        	synchronized (RemoteClient.this.obj) {
+        		RemoteClient.this.obj.notifyAll();
+    		}
         	System.out.println("rpc客户端收到响应数据："+msg);
         }
     }

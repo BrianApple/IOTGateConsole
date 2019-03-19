@@ -33,7 +33,7 @@ public class RpcDecoder extends LengthFieldBasedFrameDecoder{
 		ByteBuffer byteBuffer = buff.nioBuffer();
 		int dataAllLen = byteBuffer.limit();
 		int lenArea = byteBuffer.getShort();
-		int dataLen = dataAllLen - lenArea;
+		int dataLen = dataAllLen - 2;
 		byte[] contentData = new byte[dataLen];
         byteBuffer.get(contentData);//报头数据
         ResponseData requestData = MixAll.decode(contentData, ResponseData.class);
