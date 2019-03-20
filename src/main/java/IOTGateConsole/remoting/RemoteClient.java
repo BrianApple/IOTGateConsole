@@ -54,12 +54,10 @@ public class RemoteClient {
 		            });
 		ChannelFuture channelFuture=handler.connect(ip, port).sync();
 		channelFuture.channel().writeAndFlush(requestData).sync();
+		System.out.println("rpc调用成功等待数据响应......");
 		synchronized (obj) {
 			obj.wait();
 		}
-		 
-		 
-		System.out.println("rpc客户端启动成功......");
 		if (responseData != null) {
 			channelFuture.channel().closeFuture().sync();
 		}
@@ -122,7 +120,7 @@ public class RemoteClient {
         	synchronized (RemoteClient.this.obj) {
         		RemoteClient.this.obj.notifyAll();
     		}
-        	System.out.println("rpc客户端收到响应数据："+msg);
+        	System.out.println("rpc客户端收到响应数据："+msg.getReturnCode());
         }
     }
 }

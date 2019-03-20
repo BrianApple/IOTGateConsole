@@ -33,7 +33,7 @@ public class RPCRequestProxy {
 						// TODO Auto-generated method stub
 						RequestData requestData = new RequestData();
 						requestData.setRequestNum(UUID.randomUUID().toString());
-						requestData.setClassName(method.getDeclaringClass().getName());//获取方法所在类名称
+						requestData.setClassName(method.getDeclaringClass().getSimpleName());//获取方法所在类名称
 						requestData.setMethodName(method.getName());
 						requestData.setParamTyps(method.getParameterTypes());
 						requestData.setArgs(args);
