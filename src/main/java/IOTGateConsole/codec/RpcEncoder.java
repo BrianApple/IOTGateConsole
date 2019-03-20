@@ -3,6 +3,7 @@ package IOTGateConsole.codec;
 import IOTGateConsole.databridge.RequestData;
 import IOTGateConsole.databridge.ResponseData;
 import IOTGateConsole.util.MixAll;
+import IOTGateConsole.util.SerializationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -17,7 +18,7 @@ public class RpcEncoder extends MessageToByteEncoder<RequestData> {
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RequestData msg, ByteBuf out) throws Exception {
-		byte[] data = MixAll.encode(msg);
+		byte[] data = SerializationUtil.serialize(msg);
 		System.out.println("rpc客户端发送数据长度="+data.length);
 		out.writeShort(data.length);
 		out.writeBytes(data);

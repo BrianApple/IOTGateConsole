@@ -7,6 +7,7 @@ import IOTGateConsole.databridge.ResponseData;
 import IOTGateConsole.rpc.rpcProcessor.RPCClientProcessor;
 import IOTGateConsole.rpc.rpcProcessor.RPCClientProcessorImpl;
 import IOTGateConsole.util.MixAll;
+import IOTGateConsole.util.SerializationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -36,7 +37,7 @@ public class RpcDecoder extends LengthFieldBasedFrameDecoder{
 		int dataLen = dataAllLen - 2;
 		byte[] contentData = new byte[dataLen];
         byteBuffer.get(contentData);//报头数据
-        ResponseData requestData = MixAll.decode(contentData, ResponseData.class);
+        ResponseData requestData = SerializationUtil.deserialize(contentData, ResponseData.class);
         return requestData;
 	}
 
