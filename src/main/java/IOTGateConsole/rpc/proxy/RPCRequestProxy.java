@@ -18,12 +18,13 @@ import IOTGateConsole.remoting.RemoteClient;
 public class RPCRequestProxy {
 	
 	//TODO 缓存所有rpc服务节点信息
+	private String rpcServerIP;
 	
-	
-	public RPCRequestProxy(){
-		
+	public RPCRequestProxy(String rpcServerIP) {
+		super();
+		this.rpcServerIP = rpcServerIP;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T> T create(Class<?> clazz){
 		return (T) Proxy.newProxyInstance(clazz.getClassLoader(),new Class<?>[]{clazz}, new InvocationHandler() {
@@ -40,7 +41,7 @@ public class RPCRequestProxy {
 						
 						RemoteClient remoteClient = new RemoteClient();
 						//TODO  改为从zookeeper获取rpc数据
-						ResponseData responseData = remoteClient.start("127.0.0.1", 10916, requestData);
+						ResponseData responseData = remoteClient.start(rpcServerIP, 10916, requestData);
 						return responseData;
 					}
 				});
