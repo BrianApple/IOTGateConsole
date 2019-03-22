@@ -1,5 +1,7 @@
 package IOTGateConsole.remoting;
 
+import java.util.concurrent.CountDownLatch;
+
 import IOTGateConsole.codec.RpcDecoder;
 import IOTGateConsole.codec.RpcEncoder;
 import IOTGateConsole.databridge.RequestData;
@@ -25,13 +27,15 @@ public class RemoteClient {
 	private final Bootstrap bootstrap = new Bootstrap();
     private final EventLoopGroup eventLoopGroupWorker;
     private final Object obj = new Object();
+    private CountDownLatch lock = new CountDownLatch(1); 
     private ResponseData responseData = null;
 	public RemoteClient(){
 		eventLoopGroupWorker = new NioEventLoopGroup(1, new ThreadFactoryImpl("netty_rpc_client_", false));
 	}
 
 	public ResponseData start(String ip ,int port ,RequestData requestData) throws InterruptedException{
-		 Bootstrap handler = this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)//
+		try{
+			Bootstrap handler = this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)//
 		            //
 		            .option(ChannelOption.TCP_NODELAY, true)
 		            //
@@ -49,19 +53,21 @@ public class RemoteClient {
 		                             new RpcDecoder(), 
 		                        new IdleStateHandler(0, 0, 120),//
 		                        new NettyConnetManageHandler(), //
-		                        new NettyClientHandler());//获取数据
+		                        new NettyClientHandler(lock));//获取数据
 		                }
 		            });
-		ChannelFuture channelFuture=handler.connect(ip, port).sync();
-		channelFuture.channel().writeAndFlush(requestData).sync();
-		System.out.println("rpc调用成功等待数据响应......");
-		synchronized (obj) {
-			obj.wait();
+			ChannelFuture channelFuture=handler.connect(ip, port).sync();
+			channelFuture.channel().writeAndFlush(requestData).sync();
+			System.out.println("rpc调用成功等待数据响应......");
+			lock.await();
+			if (responseData != null) {
+				channelFuture.channel().close();
+			}
+			return responseData;
+		}finally{
+			eventLoopGroupWorker.shutdownGracefully();
 		}
-		if (responseData != null) {
-			channelFuture.channel().closeFuture().sync();
-		}
-		return responseData;
+		 
 	}
 	
 	
@@ -110,17 +116,20 @@ public class RemoteClient {
     }
 	
 	class NettyClientHandler extends SimpleChannelInboundHandler<ResponseData> {
-
+		private CountDownLatch locks;
+		public NettyClientHandler(CountDownLatch lock) {
+			// TODO Auto-generated constructor stub
+			this.locks = lock;
+		}
+		
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ResponseData msg) throws Exception {
         	/**
         	 * 调用的处理响应数据的方法
         	 */
         	RemoteClient.this.responseData = msg;
-        	synchronized (RemoteClient.this.obj) {
-        		RemoteClient.this.obj.notifyAll();
-    		}
-        	System.out.println("rpc客户端收到响应数据："+msg.getReturnCode());
+        	locks.countDown();
+        	
         }
     }
 }
