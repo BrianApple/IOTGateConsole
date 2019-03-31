@@ -16,9 +16,14 @@ import IOTGateConsole.service.TestService1;
 @Controller
 @RequestMapping("/rpc")
 @PropertySource(value = {"classpath:application.properties"},encoding="utf-8")  
+/**
+ * 
+ * Description: 
+ * @author hejuanjuan
+ * @date 2019年3月31日
+ */
 public class RpcController {
-	@Value("${zkAddr}")
-	private String zkAddr;
+	
 	@Autowired
 	TestService1 testService1;
 	

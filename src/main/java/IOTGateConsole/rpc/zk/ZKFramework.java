@@ -24,6 +24,9 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import IOTGateConsole.chache.CommonLocalCache;
 import IOTGateConsole.util.ThreadFactoryImpl;
@@ -36,9 +39,12 @@ import IOTGateConsole.util.ThreadFactoryImpl;
  * @author  yangcheng
  * @date:   2019年3月7日
  */
+@Component
+@PropertySource(value = {"classpath:application.properties"},encoding="utf-8")  
 public class ZKFramework {
 	
-	
+	@Value("${zkAddr}")
+	private String zkAddr;
 	private CuratorFramework cf ;
 	private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor(
 			new ThreadFactoryImpl("zkNodeCacheUpdate_", true));
@@ -154,8 +160,8 @@ public class ZKFramework {
 	}
 	
 	
-	
-	public void start(String zkAddr){
+	@PostConstruct
+	public void start(){
 		if(isCluster()){
 			new Thread(new Runnable() {
 				
