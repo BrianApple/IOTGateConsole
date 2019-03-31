@@ -12,8 +12,9 @@ public class TestServiceImpl implements TestService1{
 	@Autowired
 	UserMapper usermapper;
 	public int insert(User user) {
-		usermapper.insert(user);
+		//usermapper.insert(user);
 		
-		return user.getId();
+//		return user.getId();
+		return 0;
 	}
 }

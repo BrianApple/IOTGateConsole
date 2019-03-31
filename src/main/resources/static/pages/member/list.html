@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8"></meta>
+		<title>网关配置</title>
+		<meta name="renderer" content="webkit"></meta>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"></meta>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"></meta>
+		<link rel="stylesheet" href="../../css/font.css"></link>
+		<link rel="stylesheet" href="../../css/weadmin.css"></link>
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]>
+	      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+	</head>
+
+	<body>
+		<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+        <a href="">节点管理</a>
+        <a>
+          <cite>网关配置</cite></a>
+      </span>
+			<a class="layui-btn layui-btn-sm" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+				<i class="layui-icon" style="line-height:30px">&#x1002;</i></a>
+		</div>
+		<div class="weadmin-body">
+
+			<div class="weadmin-block">
+				<span class="fr" style="line-height:40px">共有数据：88 条</span>
+			</div>
+			<table class="layui-table" id="memberList">
+				<thead>
+					<tr>
+						<th>
+							<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+						</th>
+						<th>主机IP</th>
+						<th>规约编号</th>
+						<th>运行状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-id="1">
+						<td>
+							<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="1"><i class="layui-icon">&#xe605;</i></div>
+						</td>
+						<td>127.0.0.1</td>
+						<td>1,2,3</td>
+						<td class="td-status">
+							<span class="layui-btn layui-btn-normal layui-btn-xs">正常</span></td>
+						<td class="td-manage">
+
+							<a title="编辑" onclick="WeAdminEdit('编辑','./edit.html', 1, 600, 400)" href="javascript:;">
+								<i class="layui-icon">&#xe642;</i>
+							</a>
+							
+							<a title="查看" onclick="WeAdminDetail('查看','../admin/view.html', 1, 600, 400)" href="javascript:;">
+								<i class="layui-icon">&#xe63c;</i>
+							</a>
+						</td>
+					</tr>
+					
+				</tbody>
+			</table>
+			
+		</div>
+		<!--<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>-->
+		<script src="../../lib/layui/layui.js" charset="utf-8"></script>
+		<script src="../../js/eleDel.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+
+</html>
