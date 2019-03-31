@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import IOTGateConsole.domain.User;
 import IOTGateConsole.service.TestService1;
@@ -33,6 +34,15 @@ public class RpcController {
 		System.out.println("添加数据，返回值：i"+i);
 		return "index";
 	}
-	
-	
+	@RequestMapping("/data")
+	@ResponseBody
+	public User getData(){
+//		name,phone,create_time,age
+		User user=new User();
+		user.setName("326");
+		user.setPhone("326");
+		user.setCreate_time(new Date());
+		user.setAge(1);
+		return user;
+	}
 }
