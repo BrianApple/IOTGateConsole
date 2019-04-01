@@ -9,8 +9,8 @@ import IOTGateConsole.domain.User;
 @Service
 public class TestServiceImpl implements TestService1{
 	
-	@Autowired
-	UserMapper usermapper;
+//	@Autowired
+//	UserMapper usermapper;
 	public int insert(User user) {
 		//usermapper.insert(user);
 		

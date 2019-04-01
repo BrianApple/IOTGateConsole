@@ -29,6 +29,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import IOTGateConsole.chache.CommonLocalCache;
+import IOTGateConsole.rpc.proxy.RPCRequestProxy;
+import IOTGateConsole.rpc.service.RPCExportService;
 import IOTGateConsole.util.ThreadFactoryImpl;
 
 
@@ -139,7 +141,9 @@ public class ZKFramework {
 		if(!CommonLocalCache.rpcServerCache.contains(nodeIp)){
 			CommonLocalCache.rpcServerCache.add(nodeIp);
 		}
-		
+		if(!CommonLocalCache.rpcProxys.contains(nodeIp)){
+			CommonLocalCache.rpcProxys.put(nodeIp, new RPCRequestProxy(nodeIp).create(RPCExportService.class));
+		}
 	}
 	/**
 	 * 更新节点
@@ -156,7 +160,7 @@ public class ZKFramework {
 		if(!CommonLocalCache.rpcServerCache.contains(nodeIp)){
 			return;
 		}
-		CommonLocalCache.rpcServerCache.remove(nodeIp);
+		CommonLocalCache.rpcProxys.remove(nodeIp);
 	}
 	
 	
@@ -169,6 +173,10 @@ public class ZKFramework {
 				public void run() {
 					
 					try {
+						if(zkAddr == null){
+							//TODO 测试zk地址
+							zkAddr = "192.168.18.27:2181,192.168.18.27:2182,192.168.18.27:2183";
+						}
 						init(zkAddr);
 					} catch (Exception e) {
 						e.printStackTrace();

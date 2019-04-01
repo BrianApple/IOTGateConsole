@@ -31,7 +31,7 @@
 		<div class="weadmin-body">
 
 			<div class="weadmin-block">
-				<span class="fr" style="line-height:40px">共有数据：88 条</span>
+				<span class="fr" style="line-height:40px" id ="totle">节点总数：0 个</span>
 			</div>
 			<table class="layui-table" id="memberList">
 				<thead>
@@ -45,7 +45,8 @@
 						<th>操作</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id ="table_brian">
+					<!-- 
 					<tr data-id="1">
 						<td>
 							<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="1"><i class="layui-icon">&#xe605;</i></div>
@@ -65,7 +66,7 @@
 							</a>
 						</td>
 					</tr>
-					
+					-->
 				</tbody>
 			</table>
 			
@@ -77,9 +78,43 @@
 	<script type="text/javascript">
 	
 	$(function(){
-		$.post("/rpc/data", function(data){
-	          alert("Data Loaded: " + data.name);
-	          });
+		$.post("/rpc/gateData", function(data){
+				debugger;
+			var arrayData = data.data;
+			var str = ""; 
+			for(var i = 0 ; i< arrayData.length ; i ++){
+				arrayData[i].ip;
+				arrayData[i].stat;
+				arrayData[i].data;
+				str +=
+				"<tr data-id=\""+i+"\">\n" +
+				"	<td>\n" +
+				"		<div class=\"layui-unselect layui-form-checkbox\" lay-skin=\"primary\" data-id=\"1\"><i class=\"layui-icon\">&#xe605;</i></div>\n" +
+				"	</td>\n" +
+				"	<td>"+arrayData[i].ip+"</td>\n" +
+				"	<td>"+arrayData[i].data+"</td>\n" +
+				"	<td class=\"td-status\">\n" ;
+				if(arrayData[i].stat == "ok"){
+					str += "<span class=\"layui-btn layui-btn-normal layui-btn-xs\">正常</span></td>\n" ;
+				}else{
+					str += "<span class=\"layui-btn layui-btn-danger layui-btn-xs\">异常</span></td>\n" ;
+				}
+				str +=
+				"	<td class=\"td-manage\">\n" +
+				"		<a title=\"编辑\" onclick=\"WeAdminEdit('编辑','./edit.html', 1, 600, 400)\" href=\"javascript:;\">\n" +
+				"			<i class=\"layui-icon\">&#xe642;</i>\n" +
+				"		</a>\n" +
+				"		\n" +
+				"		<a title=\"查看\" onclick=\"WeAdminDetail('查看','../admin/view.html', 1, 600, 400)\" href=\"javascript:;\">\n" +
+				"			<i class=\"layui-icon\">&#xe63c;</i>\n" +
+				"		</a>\n" +
+				"	</td>\n" +
+				"</tr>";
+			}
+			$("#table_brian").append(str);
+			$("#totle").html("节点总数："+arrayData.length+"个");
+	       	
+	    });
 		
 	})
 		
