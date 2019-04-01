@@ -27,6 +27,7 @@
 			}
 			body{overflow-y: scroll;}
 		</style>
+		<script src="../../js/jquery-3.1.1.js"></script>
 	</head>
 
 	<body>
@@ -42,51 +43,68 @@
 		<div class="weadmin-body">
 			<div class="layui-row">
 				<form class="layui-form layui-col-md12 we-search">
+					
 					<div class="layui-inline">
-						<input class="layui-input" placeholder="开始日" name="start" id="start">
-					</div>
-					<div class="layui-inline">
-						<input class="layui-input" placeholder="截止日" name="end" id="end">
-					</div>
-					<div class="layui-inline">
-						<input type="text" name="keyword" placeholder="请输入关键字" autocomplete="off" class="layui-input">
+						<input type="text" name="keyword" placeholder="请输入规约编号" autocomplete="off" class="layui-input">
 					</div>
 					<button class="layui-btn" lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
 				</form>
 			</div>
-			<div class="weadmin-block demoTable">
-				<button class="layui-btn" onclick="WeAdminShow('添加用户','./add.html',600,400)"><i class="layui-icon">&#xe61f;</i>添加</button>
-				<span class="fr" style="line-height:40px">共有数据：88 条</span>
+			<div class="weadmin-block">
+				<button class="layui-btn" onclick="WeAdminShow('添加用户','./add.html',600,400)"><i class="layui-icon"></i>添加</button>
+				<span class="fr" style="line-height:40px">规约总数：128 条</span>
 			</div>
-			<table class="layui-hide" id="articleList"></table>
+			<table class="layui-table" id="memberList">
+				<thead>
+					<tr>
+						<th>
+							<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+						</th>
+						<th>规约编号</th>
+						<th>大端模式</th>
+						<th>长度域偏移量</th>
+						<th>长度域长度</th>
+						<th>长度域值是否包含长度域本身</th>
+						<th>剩余字节数</th>
+						<th>端口号</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody id ="table_brian">
+					
+					<tr data-id="1">
+						<td>
+							<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="1"><i class="layui-icon">&#xe605;</i></div>
+						</td>
+						<td>1</td>
+						<td>0</td>
+						<td>2</td>
+						<td>1</td>
+						<td>0</td>
+						<td>0</td>
+						<td>9527</td>
+						<td class="td-manage">
 
-
-			<script type="text/html" id="recommendTpl">
-				<input type="checkbox" name="zzz" lay-skin="switch" lay-text="已推荐|未推荐" {{d.recommend}}>
-			</script>
-			<script type="text/html" id="topTpl">
-				<input type="checkbox" name="show" lay-skin="switch" lay-text="已置顶|未置顶" {{d.top}}>
-			</script>
-			<script type="text/html" id="reviewTpl">
-			  <!-- 这里的 checked 的状态只是演示 -->
-			  <input type="checkbox" name="lock" value="{{d.id}}" title="锁定" lay-filter="lockDemo" {{ d.id == 1 ? 'checked' : '' }}>
-			</script>
-
-			<script type="text/html" id="operateTpl">
-				<a title="编辑" onclick="WeAdminEdit('编辑','./edit.html', 2, 600, 400)" href="javascript:;">
-					<i class="layui-icon">&#xe642;</i>
-				</a>
-				<a title="查看" onclick="WeAdminShow('查看文章','./show.html',600,400)" href="javascript:;">
-					<i class="layui-icon">&#xe63c;</i>
-				</a>
-				<a title="删除" onclick="member_del(this,'要删除的id')" href="javascript:;">
-					<i class="layui-icon">&#xe640;</i>
-				</a>
-			</script>
+							<a title="编辑" onclick="WeAdminEdit('编辑','./edit.html', 1, 600, 400)" href="javascript:;">
+								<i class="layui-icon">&#xe642;</i>
+							</a>
+							
+							
+							<a title="删除" onclick="del(11)" href="javascript:;">
+								<i class="layui-icon"></i>
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 			<script src="../../lib/layui/layui.js" charset="utf-8"></script>
 			<script src="list.js" type="text/javascript" charset="utf-8"></script>
 
 		</div>
 	</body>
-
+	<script type="text/javascript">
+		function del(a){
+			alert(a);
+		}
+	</script>
 </html>

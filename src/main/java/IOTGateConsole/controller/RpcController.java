@@ -1,16 +1,19 @@
 package IOTGateConsole.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import IOTGateConsole.databridge.ReqWebData;
 import IOTGateConsole.databridge.RetData;
+import IOTGateConsole.databridge.Strategy;
 import IOTGateConsole.domain.User;
 import IOTGateConsole.service.RpcService;
 import IOTGateConsole.service.TestService1;
@@ -42,10 +45,33 @@ public class RpcController {
 		System.out.println("添加数据，返回值：i"+i);
 		return "index";
 	}
+	
 	@RequestMapping("/gateData")
 	@ResponseBody
 	public RetData getData(){
 		RetData  ret=rpcService.getAllGateInfo();
+		return ret;
+	}
+	
+	@RequestMapping("/addOneStrategy")
+	@ResponseBody
+	public RetData addOneStrategy(ReqWebData args){
+		//{bigdian=1, leftLen=1, len2=1, lenOffset=1, lenrange=1, pid=1, port=1}
+		RetData  ret=rpcService.addOneStrategy(args);
+		return ret;
+	}
+	
+	@RequestMapping("/getAllStrategeFromDB")
+	@ResponseBody
+	public RetData getAllStrategeFromDB(){
+		RetData  ret=rpcService.getAllStrategeFromDB();
+		return ret;
+	}
+	
+	@RequestMapping("/updateStrategyNode")
+	@ResponseBody
+	public RetData updateStrategy2Node(ReqWebData args){
+		RetData  ret=rpcService.updateStrategy2Node(args);
 		return ret;
 	}
 }

@@ -16,6 +16,7 @@
 	    <![endif]-->
 	    
 	    <script src="../../js/jquery-3.1.1.js"></script>
+	    <script type="text/javascript" src="../../js/admin.js"></script>
 	</head>
 
 	<body>
@@ -84,8 +85,9 @@
 			var str = ""; 
 			for(var i = 0 ; i< arrayData.length ; i ++){
 				arrayData[i].ip;
-				arrayData[i].stat;
 				arrayData[i].data;
+				arrayData[i].stat;
+				
 				str +=
 				"<tr data-id=\""+i+"\">\n" +
 				"	<td>\n" +
@@ -101,12 +103,8 @@
 				}
 				str +=
 				"	<td class=\"td-manage\">\n" +
-				"		<a title=\"编辑\" onclick=\"WeAdminEdit('编辑','./edit.html', 1, 600, 400)\" href=\"javascript:;\">\n" +
+				"		<a title=\"编辑\" onclick=\"WeAdminEdit2('编辑','./edit.html', '"+arrayData[i].ip+"','"+arrayData[i].data+"', 600, 400)\" href=\"javascript:;\">\n" +
 				"			<i class=\"layui-icon\">&#xe642;</i>\n" +
-				"		</a>\n" +
-				"		\n" +
-				"		<a title=\"查看\" onclick=\"WeAdminDetail('查看','../admin/view.html', 1, 600, 400)\" href=\"javascript:;\">\n" +
-				"			<i class=\"layui-icon\">&#xe63c;</i>\n" +
 				"		</a>\n" +
 				"	</td>\n" +
 				"</tr>";
@@ -117,7 +115,50 @@
 	    });
 		
 	})
-		
+	/*
+		自我改造：弹出层+传递参数
+	*/
+	window.WeAdminEdit2 = function(title, url, ip,strategy, w, h) {
+		if(title == null || title == '') {
+			title = false;
+		};
+		if(url == null || url == '') {
+			url = "404.html";
+		};
+		if(w == null || w == '') {
+			w = ($(window).width() * 0.9);
+		};
+		if(h == null || h == '') {
+			h = ($(window).height() - 50);
+		};
+		layer.open({
+			type: 2,
+			area: [w + 'px', h + 'px'],
+			fix: false, //不固定
+			maxmin: true,
+			shadeClose: true,
+			shade: 0.4,
+			title: title,
+			content: url,
+			success: function(layero, index) {
+				//向iframe页的id=house的元素传值  // 参考 https://yq.aliyun.com/ziliao/133150
+				var body = layer.getChildFrame('body', index);
+				body.contents().find("#nodeIP").val(ip);//ip赋值
+				var arra01 = strategy.split("/");
+				var datas = [];
+				for(var i = 0 ;i< arra01.length-1 ; i++){
+					datas.push(arra01[i].split(":")[0].trim());
+				}
+				
+				var iframe = window['layui-layer-iframe' + index];
+                // 向子页面的全局函数child传参
+                iframe.child(datas);
+			},
+			error: function(layero, index) {
+				alert("aaa");
+			}
+		});
+	}	
 	</script>
 
 </html>
