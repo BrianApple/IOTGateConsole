@@ -19,7 +19,6 @@ public class RpcEncoder extends MessageToByteEncoder<RequestData> {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, RequestData msg, ByteBuf out) throws Exception {
 		byte[] data = SerializationUtil.serialize(msg);
-		System.out.println("rpc客户端发送数据长度="+data.length);
 		out.writeShort(data.length);
 		out.writeBytes(data);
 	}
