@@ -10,6 +10,8 @@ public class Strategy {
 		this.name = name;
 		this.val = val;
 	}
+	
+	
 	private String name;
 	private String val;
 	public String getName() {

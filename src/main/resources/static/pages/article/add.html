@@ -32,6 +32,14 @@
 					</div>
 				</div>
 				<div class="layui-form-item">
+					<label for="L_email" class="layui-form-label">
+		                <span class="we-red">*</span>规约名称
+		            </label>
+					<div class="layui-input-inline">
+						<input type="text" id="straName" name="straName" lay-verify="required" autocomplete="" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
 				    <label for="L_sex" class="layui-form-label">大端模式</label>
 				    <div class="layui-input-block" id="L_sex">
 				      <input type="radio" name="bigdian" value="1" title="是" checked>
@@ -141,11 +149,12 @@
 								
 			    					var _len = parent.$('#memberList tr').length;
 									parent.$('#memberList').append(						
-										'<tr data-id="' + _len + '">' +
+										'<tr data-id="' + f.pid + '">' +
 											'<td>'+
-												'<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="' + _len + '"><i class="layui-icon">&#xe605;</i></div>'+
+												'<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="' + f.pid + '"><i class="layui-icon">&#xe605;</i></div>'+
 											'</td>'+
 											'<td>' + f.pid + '</td>'+
+											'<td>' + f.straName + '</td>'+
 											'<td>'+f.bigdian+'</td>'+
 											'<td>'+f.lenOffset+'</td>'+
 											'<td>'+f.lenrange+'</td>'+
@@ -153,8 +162,7 @@
 											'<td>'+f.leftLen+'</td>'+
 											'<td>'+f.port+'</td>'+
 											'<td class="td-manage">'+
-												'<a title="编辑" onclick="WeAdminShow(\'编辑\',\'./edit.html\',600,400)" href="javascript:;"><i class="layui-icon">&#xe642;</i></a>'+
-												'<a title="删除" onclick="member_del(this,\'要删除的id\')" href="javascript:;"><i class="layui-icon">&#xe640;</i></a>'+
+												'<a title="删除" onclick="member_del(this,\'' + f.pid + '\')" href="javascript:;"><i class="layui-icon">&#xe640;</i></a>'+
 											'</td>'+
 										'</tr>'	
 									);

@@ -68,10 +68,23 @@ public class RpcController {
 		return ret;
 	}
 	
+	@RequestMapping("/getAllStrategyAllInfo")
+	@ResponseBody
+	public RetData getAllStrategyAllInfo(){
+		RetData  ret=rpcService.getAllStrategyAllInfo();
+		return ret;
+	}
+	
 	@RequestMapping("/updateStrategyNode")
 	@ResponseBody
 	public RetData updateStrategy2Node(ReqWebData args){
 		RetData  ret=rpcService.updateStrategy2Node(args);
+		return ret;
+	}
+	@RequestMapping("/delOneStrategyByPID")
+	@ResponseBody
+	public RetData delOneStrategyByPID(ReqWebData args){
+		RetData  ret=rpcService.delOneStrategyByPID(args);
 		return ret;
 	}
 }

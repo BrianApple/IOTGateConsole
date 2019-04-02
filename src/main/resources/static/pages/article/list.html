@@ -52,7 +52,7 @@
 			</div>
 			<div class="weadmin-block">
 				<button class="layui-btn" onclick="WeAdminShow('添加用户','./add.html',600,400)"><i class="layui-icon"></i>添加</button>
-				<span class="fr" style="line-height:40px">规约总数：128 条</span>
+				<span class="fr" style="line-height:40px" id="strategy_total">规约总数：0 条</span>
 			</div>
 			<table class="layui-table" id="memberList">
 				<thead>
@@ -61,6 +61,7 @@
 							<div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
 						</th>
 						<th>规约编号</th>
+						<th>名称</th>
 						<th>大端模式</th>
 						<th>长度域偏移量</th>
 						<th>长度域长度</th>
@@ -72,11 +73,12 @@
 				</thead>
 				<tbody id ="table_brian">
 					
-					<tr data-id="1">
+					<!-- <tr data-id="1">
 						<td>
 							<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="1"><i class="layui-icon">&#xe605;</i></div>
 						</td>
 						<td>1</td>
+						<td></td>
 						<td>0</td>
 						<td>2</td>
 						<td>1</td>
@@ -94,7 +96,7 @@
 								<i class="layui-icon"></i>
 							</a>
 						</td>
-					</tr>
+					</tr> -->
 				</tbody>
 			</table>
 			<script src="../../lib/layui/layui.js" charset="utf-8"></script>
@@ -103,8 +105,60 @@
 		</div>
 	</body>
 	<script type="text/javascript">
+		$(function(){
+			getAllStrategy();
+		})
+	
+		function getAllStrategy(){
+			$.post("/rpc/getAllStrategyAllInfo",function(data){
+				if(data.retSig == 200){
+					var retData = data.data[0];
+					var str = "";
+					for(var i=0;i<retData.length;i++){
+						var iotGateDB = retData[i];
+						str +=
+						'<tr data-id="' + iotGateDB.pId + '">' +
+							'<td>'+
+								'<div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id="' + iotGateDB.pId + '"><i class="layui-icon">&#xe605;</i></div>'+
+							'</td>'+
+							'<td>' + iotGateDB.pId + '</td>'+
+							'<td>' + iotGateDB.pName + '</td>'+
+							'<td>'+iotGateDB.isBigEndian+'</td>'+
+							'<td>'+iotGateDB.lengthFieldOffset+'</td>'+
+							'<td>'+iotGateDB.lengthFieldLength+'</td>'+
+							'<td>'+iotGateDB.isDataLenthIncludeLenthFieldLenth+'</td>'+
+							'<td>'+iotGateDB.exceptDataLenth+'</td>'+
+							'<td>'+iotGateDB.port+'</td>'+
+							'<td class="td-manage">'+
+								'<a title="删除" onclick="delStrategy(this,\'' + iotGateDB.pId + '\')" href="javascript:;"><i class="layui-icon">&#xe640;</i></a>'+
+							'</td>'+
+						'</tr>'	;
+					}
+					$("#strategy_total").html("规约总数"+retData.length+"条")
+					$('#memberList').append(str);
+				}
+			});
+			
+		}
 		function del(a){
 			alert(a);
+		}
+		//删除一行数据
+		function  delStrategy (obj, pid) {
+			layer.confirm('该操作同时会停止并删除所有网关节点上当前规约的解析服务及数据，您确认要删除吗？', function(index) {
+				//发异步删除数据
+				$.post("/rpc/delOneStrategyByPID",{"str":pid},function(data){
+					if(data.retSig == 200){
+						$(obj).parents("tr").remove();
+						layer.msg('已删除!', {
+							icon: 1,
+							time: 1000
+						});
+					}
+					
+				},"json");
+				
+			});
 		}
 	</script>
 </html>

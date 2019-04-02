@@ -31,4 +31,17 @@ public interface RpcService {
 	 */
 	RetData updateStrategy2Node(ReqWebData args);
 
+	/**
+	 * 获取所有规约的所有信息
+	 * @return
+	 */
+	RetData getAllStrategyAllInfo();
+
+	/**
+	 * 根据id删除规约，同时删除所有网关节点关联的当前规约
+	 * @param args
+	 * @return
+	 */
+	RetData delOneStrategyByPID(ReqWebData args);
+
 }
