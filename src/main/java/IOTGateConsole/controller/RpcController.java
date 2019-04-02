@@ -30,8 +30,6 @@ import IOTGateConsole.service.TestService1;
 public class RpcController {
 	
 	@Autowired
-	TestService1 testService1;
-	@Autowired
 	RpcService rpcService;
 	@RequestMapping("/index")
 	public String initPage(){
@@ -41,8 +39,6 @@ public class RpcController {
 		user.setPhone("326");
 		user.setCreate_time(new Date());
 		user.setAge(1);
-		int i=testService1.insert(user);
-		System.out.println("添加数据，返回值：i"+i);
 		return "index";
 	}
 	
