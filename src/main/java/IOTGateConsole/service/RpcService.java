@@ -44,4 +44,10 @@ public interface RpcService {
 	 */
 	RetData delOneStrategyByPID(ReqWebData args);
 
+	/**
+	 * 节点规约数据同步--防止节点缓存的规约策略与本地数据库不同步
+	 * @param nodeIp
+	 */
+	void synchonizeStrategy(String nodeIp);
+
 }

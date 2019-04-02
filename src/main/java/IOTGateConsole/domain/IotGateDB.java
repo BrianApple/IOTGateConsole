@@ -1,6 +1,8 @@
 package IOTGateConsole.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IotGateDB implements Serializable{
 	private static final long serialVersionUID = 5682133289282639734L;
@@ -93,10 +95,24 @@ public class IotGateDB implements Serializable{
 	}
 	@Override
 	public String toString() {
-		return "IotGateDB [id=" + id + ", pId=" + pId + ", isBigEndian=" + isBigEndian + ", beginHexVal=" + beginHexVal
-				+ ", lengthFieldOffset=" + lengthFieldOffset + ", lengthFieldLength=" + lengthFieldLength
-				+ ", isDataLenthIncludeLenthFieldLenth=" + isDataLenthIncludeLenthFieldLenth + ", exceptDataLenth="
-				+ exceptDataLenth + ", port=" + port + ", highControll=" + highControll + ", content=" + content + "]";
+		 String str = pId + "," + isBigEndian+ "," +
+				beginHexVal + "," +lengthFieldOffset + "," +lengthFieldLength + "," +isDataLenthIncludeLenthFieldLenth
+				+ "," +exceptDataLenth+ "," + port;
+//		 System.out.println(str);
+		
+		 return str;
+	}
+	public List<Integer>  toList(){
+		 List<Integer> arg= new ArrayList<>();
+		 arg.add(pId);
+		 arg.add(isBigEndian);
+		 arg.add(-1);
+		 arg.add(lengthFieldOffset);
+		 arg.add(lengthFieldLength);
+		 arg.add(isDataLenthIncludeLenthFieldLenth);
+		 arg.add(exceptDataLenth);
+		 arg.add(port);
+		 return arg;
 	}
 
 }

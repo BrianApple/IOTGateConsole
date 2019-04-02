@@ -24,6 +24,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 import IOTGateConsole.chache.CommonLocalCache;
 import IOTGateConsole.rpc.proxy.RPCRequestProxy;
 import IOTGateConsole.rpc.service.RPCExportService;
+import IOTGateConsole.service.RpcService;
 import IOTGateConsole.util.ThreadFactoryImpl;
 
 
@@ -44,6 +46,8 @@ import IOTGateConsole.util.ThreadFactoryImpl;
 @Component
 @PropertySource(value = {"classpath:application.properties"},encoding="utf-8")  
 public class ZKFramework {
+	@Autowired
+	RpcService rpcService;
 	
 	@Value("${zkAddr}")
 	private String zkAddr;
@@ -141,9 +145,11 @@ public class ZKFramework {
 		if(!CommonLocalCache.rpcServerCache.contains(nodeIp)){
 			CommonLocalCache.rpcServerCache.add(nodeIp);
 		}
-		if(!CommonLocalCache.rpcProxys.contains(nodeIp)){
+		if(!CommonLocalCache.rpcProxys.containsKey(nodeIp)){
 			CommonLocalCache.rpcProxys.put(nodeIp, new RPCRequestProxy(nodeIp).create(RPCExportService.class));
 		}
+		//节点规约同步
+		rpcService.synchonizeStrategy(nodeIp);
 	}
 	/**
 	 * 更新节点

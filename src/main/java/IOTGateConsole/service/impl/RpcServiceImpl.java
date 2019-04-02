@@ -20,7 +20,7 @@ import IOTGateConsole.domain.IotGateDB;
 import IOTGateConsole.rpc.service.RPCExportService;
 import IOTGateConsole.service.RpcService;
 /**
- * 
+ * rpc调用类
  * @Description: 
  * @author  yangcheng
  * @date:   2019年4月1日
@@ -50,7 +50,9 @@ public class RpcServiceImpl implements RpcService{
 					String[] arg = it.next().getValue().split("\\,");;
 					str += (arg[0]+":"+arg[arg.length-1]+"/ ");
 				}
-				aStrategy.put("data", str.substring(0, str.length()-1));
+				if(!"".equals(str)){
+					aStrategy.put("data", str.substring(0, str.length()-1));
+				}
 			}else{
 				aStrategy.put("stat", "error");
 			}
@@ -133,28 +135,41 @@ public class RpcServiceImpl implements RpcService{
 
 	@Override
 	public RetData updateStrategy2Node(ReqWebData args) {
-		// TODO Auto-generated method stub
 		List<Object> data = args.getDataList();
-//		Iterator<Map.Entry<String, String>> it = data.entrySet().iterator();
-//		while(it.hasNext()){
-//			Map.Entry<String, String> entry = it.next();
-//			String key = entry.getKey();
-//			String value = entry.getKey();
-//		}
 		String ip = args.getStr();
 		RPCExportService rpcExportService = CommonLocalCache.rpcProxys.get(ip);
 		
-		
+		/**
+		 * 中心思想：停运没选中的，开启选中的
+		 */
 		if(rpcExportService != null){
-			for (Object object : data) {
-				Integer pid = Integer.parseInt(object.toString());
+			ResponseData  rpdata= rpcExportService.getAllProtocal(true);
+			Map retMap = (Map) rpdata.getData().get(0);
+			Iterator<Map.Entry<String, String>> it= retMap.entrySet().iterator();
+			List<String> nodeStategyPid = new ArrayList<>();//现运行的策略
+			while(it.hasNext()){
+				String[] arg = it.next().getValue().split("\\,");;
+				nodeStategyPid.add(arg[0]);
+			}
+			
+			
+			for (Object pid : data) {
 				//启动规约
-				System.out.println("启动规约"+pid);
-				rpcExportService.startProtocalServiceByPid(pid+"");
+				String nPid = pid.toString();
+				if(nodeStategyPid.contains(nPid)){
+					nodeStategyPid.remove(nPid);
+				}else{
+					System.out.println("启动规约"+nPid);
+					rpcExportService.startProtocalServiceByPid(nPid.toString());
+				}
+				
 				
 //				IotGateDB iotGateDB = new IotGateDB();
 //				iotGateDB.setpId(pid);
 //				List<IotGateDB>  retList= iotGateMapper.getStrategyByPid(iotGateDB);
+			}
+			for (String pid : nodeStategyPid) {
+				rpcExportService.stopProtocalServiceByPid(pid);
 			}
 		}
 		
@@ -195,6 +210,29 @@ public class RpcServiceImpl implements RpcService{
 		iotGateMapper.delOneStrategyByPID(iotgate);
 		ret.setRetSig(200);
 		return ret;
+	}
+
+	@Override
+	public void synchonizeStrategy(String nodeIp) {
+		
+		RPCExportService rpcExportService = CommonLocalCache.rpcProxys.get(nodeIp);
+		if(rpcExportService != null){
+			
+			List<IotGateDB>  retList= iotGateMapper.getAllStrategy();
+			for (IotGateDB iotGateDB : retList) {
+				
+				if(iotGateDB.getHighControll() == 0){
+					//非高级功能
+					int localPID = iotGateDB.getpId();
+					//如果已经存在则不会重复添加
+					rpcExportService.addNewProtocal(localPID+"", iotGateDB.toList(), false);
+				}else{
+					//TODO 高级功能
+				}
+			}
+			
+		}
+		
 	}
 
 }

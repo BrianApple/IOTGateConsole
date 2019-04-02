@@ -39,14 +39,14 @@
 						</select>
 				    </div>
 				    <div class="layui-form-mid layui-word-aux">
-						多选
+						自动开启关闭节点规约解析类型
 					</div>
 				 </div>
-		
+				
 				<div class="layui-form-item">
 					<label for="L_repass" class="layui-form-label">
              		</label>
-					<button class="layui-btn" lay-filter="add" lay-submit="">确定</button>
+					<button class="layui-btn"  lay-filter="add" lay-submit="">确定</button>
 					<input type="hidden" name="dataId" id="dataId" value="" />
 				</div>
 			</form>
@@ -101,7 +101,7 @@
 								$.post("/rpc/updateStrategyNode",{"dataList":ss.substring(0,ss.length-1),"str":$("#nodeIP").val()} ,
 									function(data){
 										if(data.retSig == 200){
-											layer.alert("增加成功", {
+											layer.alert("操作成功！", {
 												icon: 6
 											}, function() {
 												//刷新父页面
