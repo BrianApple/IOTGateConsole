@@ -18,5 +18,5 @@ GATE Console 是一个web工程，用户登录之后可以查看当前GATE CLUST
 - 2.在/IOTGateConsole/src/main/resources/application.properties配置文件中配置数据库参数和zookeeper相关参数
 - 3.将本项目打成一个可执行jar包，启动jar包，默认端口为8686，可以在application.properties中自定义
 - 4.访问地址如：http://127.0.0.1:8686/rpc/index ，第一次f访问会跳转到登录页让输入用户名密码，这个随意填写，没有存库！登录之后便可以发现查看当前zookeeper中注册的网关节点已经当前数据库中的规约信息，如何配置请看:[https://blog.csdn.net/sinat_28771747/article/details/88783309](https://blog.csdn.net/sinat_28771747/article/details/88783309)
-### 联系方式
-邮箱：1012702024@qq.com
+### 交流群
+- QQ群：844082385
