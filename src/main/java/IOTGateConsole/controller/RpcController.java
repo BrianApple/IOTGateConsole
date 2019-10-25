@@ -55,6 +55,7 @@ public class RpcController {
 		//{bigdian=1, leftLen=1, len2=1, lenOffset=1, lenrange=1, pid=1, port=1}
 		RetData  ret=rpcService.addOneStrategy(args);
 		return ret;
+//		return new RetData();//用于演示版代码
 	}
 	
 	@RequestMapping("/getAllStrategeFromDB")
@@ -76,11 +77,13 @@ public class RpcController {
 	public RetData updateStrategy2Node(ReqWebData args){
 		RetData  ret=rpcService.updateStrategy2Node(args);
 		return ret;
+//		return new RetData();//用于演示版代码
 	}
 	@RequestMapping("/delOneStrategyByPID")
 	@ResponseBody
 	public RetData delOneStrategyByPID(ReqWebData args){
 		RetData  ret=rpcService.delOneStrategyByPID(args);
 		return ret;
+//		return new RetData();//用于演示版代码
 	}
 }
