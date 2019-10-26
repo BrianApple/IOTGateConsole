@@ -75,9 +75,9 @@ public class RpcController {
 	@RequestMapping("/updateStrategyNode")
 	@ResponseBody
 	public RetData updateStrategy2Node(ReqWebData args){
-		RetData  ret=rpcService.updateStrategy2Node(args);
-		return ret;
-//		return new RetData();//用于演示版代码
+//		RetData  ret=rpcService.updateStrategy2Node(args);
+//		return ret;
+		return new RetData();//用于演示版代码
 	}
 	@RequestMapping("/delOneStrategyByPID")
 	@ResponseBody
