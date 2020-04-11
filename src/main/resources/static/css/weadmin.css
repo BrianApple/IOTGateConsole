@@ -270,6 +270,14 @@ body {
   height: 45px;
   float: left;
 }
+.container .gitee {
+  float: right;
+  color: #fff;
+  font-size: 18px;
+  padding-left: 20px;
+  line-height: 45px;
+  width: 180px;
+}
 .container .left_open i {
   display: block;
   background: rgba(255, 255, 255, 0.1) 0 0 no-repeat;
