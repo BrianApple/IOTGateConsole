@@ -6,7 +6,9 @@ IOTGateConsole是IOTGate智能网关的控制台程序，用于查看当前IOTGa
 ### 架构变更说明（v2.0）
 本版本对架构做了两项重要调整：
 
-1. **去除 Zookeeper 依赖**：网关节点发现不再依赖 ZK 注册中心，改为在 `application.properties` 中通过 `gate.nodes` 静态配置网关节点 IP 列表（支持 `ip` 或 `ip:port` 格式，默认 RPC 端口 10916）。
+1. **去除 Zookeeper 依赖**：网关节点发现不再依赖 ZK 注册中心，改为**网关主动注册 + 静态配置兜底**双通道：
+   - **动态注册（推荐）**：网关启动时通过 `-c -r <consoleIp>` 主动注册到本控制台（`POST /gate/register`），注册成功后每 10s 心跳上报（`POST /gate/heartbeat`），30s 未收到心跳自动判离线并移除；网关正常关闭时主动反注册（`POST /gate/unregister`）。注册成功即自动同步规约，前端节点管理页实时可见。
+   - **静态兜底**：`application.properties` 中 `gate.nodes` 配置网关节点 IP 列表（支持 `ip` 或 `ip:port` 格式，默认 RPC 端口 10916），与动态注册并存，注册的节点优先、静态配置兜底。
 2. **前端 Vue3 重构 + SSE 实时推送**：原 LayUI/jQuery 静态页面已重构为 Vue3 + Vite 单页应用；前端通过 SSE（`GET /rpc/events`）实时接收网关节点上下线状态、规约变更事件，替代原 ZK 事件监听机制。
 
 ### 智能体模式（v2.2 悬浮机器人）
@@ -59,6 +61,10 @@ GATE Console 是一个web工程，用户登录之后可以查看当前GATE CLUST
 	IotGateConsoleApplication
 
 ### 接口说明
+- `POST /gate/register` 网关主动注册(网关 -c -r 模式启动时调用，注册成功即同步规约)
+- `POST /gate/heartbeat` 网关心跳上报(默认每10s一次；节点不存在时返回 retSig=404 触发网关重新注册)
+- `POST /gate/unregister` 网关反注册(正常关闭时调用)
+- `GET /gate/nodes` 查看当前注册表中的节点
 - `POST /rpc/gateData` 获取所有网关节点信息(含运行规约)
 - `POST /rpc/addOneStrategy` 新增规约(表单格式 data[pid]=xx&data[straName]=xx...)
 - `POST /rpc/getAllStrategeFromDB` 获取所有规约名称与编号
