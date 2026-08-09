@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 
 public class MixAll {
 	private static final String CLASS_SUFFIX = ".class";
@@ -299,7 +299,7 @@ public class MixAll {
 	 * @return
 	 */
 	public static byte[] encode(final Object obj) {
-        final String json = JSON.toJSONString(obj, false);;
+        final String json = JSON.toJSONString(obj);;
         if (json != null) {
             return json.getBytes(Charset.forName("UTF-8"));
         }

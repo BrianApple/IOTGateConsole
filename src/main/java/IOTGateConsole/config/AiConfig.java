@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import IOTGateConsole.service.ProtocolParser;
@@ -17,16 +17,16 @@ import IOTGateConsole.service.ProtocolParser;
 /**
  * AI 智能体配置（LangChain4j）
  *
- * 组装 ChatLanguageModel（DeepSeek 走 OpenAI 兼容协议）并通过 AiServices
- * 生成 ProtocolParser 声明式 AI 服务代理。
+ * 大模型厂商无关：通过 OpenAI 兼容协议接入任意厂家模型，
+ * 用户只需在 application.properties 或环境变量中配置：
+ *   ai.api-key=${DEEPSEEK_API_KEY:}      # API Key（本地模型如 Ollama 可留空）
+ *   ai.base-url=https://api.deepseek.com/v1  # 兼容端点，可切换通义/智谱/Ollama/OpenAI 等
+ *   ai.model=deepseek-chat               # 模型名称
+ *   ai.temperature=0.1                   # 采样温度
+ *   ai.timeout-seconds=60                # 请求超时
  *
- * 未配置 ai.api-key 时应用照常启动，仅智能体功能不可用（返回明确提示），
- * 不影响控制台其他功能。
- *
- * 配置项（application.properties 或环境变量）：
- *   ai.api-key=${DEEPSEEK_API_KEY:}
- *   ai.base-url=https://api.deepseek.com
- *   ai.model=deepseek-chat
+ * 未配置 ai.api-key 且目标端点需要鉴权时，请求会失败并返回明确错误；
+ * 应用本身照常启动，不影响控制台其他功能。
  *
  * @author willbeahero
  * @date:   2026年8月10日
@@ -39,42 +39,59 @@ public class AiConfig {
 	@Value("${ai.api-key:}")
 	private String apiKey;
 
-	@Value("${ai.base-url:https://api.deepseek.com}")
+	@Value("${ai.base-url:https://api.deepseek.com/v1}")
 	private String baseUrl;
 
 	@Value("${ai.model:deepseek-chat}")
 	private String model;
 
+	@Value("${ai.temperature:0.1}")
+	private Double temperature;
+
+	@Value("${ai.timeout-seconds:60}")
+	private Long timeoutSeconds;
+
 	@Bean
-	public ChatLanguageModel chatLanguageModel() {
-		if (apiKey == null || apiKey.trim().isEmpty()) {
-			log.warn("[AI] 未配置 ai.api-key（DEEPSEEK_API_KEY），智能体功能不可用，控制台其他功能正常");
-			return null;
-		}
-		// DeepSeek OpenAI 兼容接口：base-url 需指向 .../v1，langchain4j 内部拼接 /chat/completions
-		String endpoint = baseUrl.endsWith("/v1") ? baseUrl : baseUrl + "/v1";
-		log.info("[AI] 初始化 ChatLanguageModel: baseUrl={} model={}", endpoint, model);
+	public ChatModel chatLanguageModel() {
+		// 兼容用户配置端点不带 /v1 的情况（如 https://api.deepseek.com）
+		String endpoint = normalizeBaseUrl(baseUrl);
+		log.info("[AI] 初始化 ChatLanguageModel: baseUrl={} model={} temperature={}",
+				endpoint, model, temperature);
 		return OpenAiChatModel.builder()
 				.baseUrl(endpoint)
-				.apiKey(apiKey)
+				.apiKey(apiKey == null ? "" : apiKey.trim())
 				.modelName(model)
-				.temperature(0.1)
-				.timeout(Duration.ofSeconds(60))
+				.temperature(temperature)
+				.timeout(Duration.ofSeconds(timeoutSeconds))
 				.logRequests(true)
 				.logResponses(true)
 				.build();
 	}
 
 	@Bean
-	public ProtocolParser protocolParser(ObjectProvider<ChatLanguageModel> modelProvider) {
-		ChatLanguageModel model = modelProvider.getIfAvailable();
+	public ProtocolParser protocolParser(ObjectProvider<ChatModel> modelProvider) {
+		ChatModel model = modelProvider.getIfAvailable();
 		if (model == null) {
 			log.warn("[AI] ChatLanguageModel 未就绪，跳过 ProtocolParser 装配");
 			return null;
 		}
 		log.info("[AI] 通过 AiServices 装配 ProtocolParser");
 		return AiServices.builder(ProtocolParser.class)
-				.chatLanguageModel(model)
+				.chatModel(model)
 				.build();
+	}
+
+	/**
+	 * 归一化兼容端点：确保以 /v1 结尾（langchain4j 内部拼接 /chat/completions）
+	 */
+	private String normalizeBaseUrl(String url) {
+		if (url == null || url.trim().isEmpty()) {
+			return "https://api.deepseek.com/v1";
+		}
+		String u = url.trim();
+		if (u.endsWith("/")) {
+			u = u.substring(0, u.length() - 1);
+		}
+		return u.endsWith("/v1") ? u : u + "/v1";
 	}
 }

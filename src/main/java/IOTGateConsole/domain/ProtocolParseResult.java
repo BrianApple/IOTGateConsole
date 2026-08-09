@@ -1,5 +1,7 @@
 package IOTGateConsole.domain;
 
+import com.alibaba.fastjson2.annotation.JSONField;
+
 /**
  * 规约解析结果（AI 结构化输出）
  *
@@ -14,6 +16,7 @@ package IOTGateConsole.domain;
 public class ProtocolParseResult {
 
 	/** 规约名称（根据上下文合理命名） */
+	@JSONField(name = "pName")
 	private String pName;
 
 	/** 长度域字节序：1=大端 0=小端 */
