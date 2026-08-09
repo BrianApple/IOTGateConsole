@@ -71,3 +71,8 @@ export function delOneStrategyByPID(pid) {
 export function updateStrategyNode(ip, pidList) {
   return postForm('/rpc/updateStrategyNode', { str: ip, dataList: pidList })
 }
+
+// 智能体模式：解析规约帧结构
+export function aiParseProtocol(frameDesc) {
+  return http.post('/rpc/ai/parse', { frameDesc })
+}

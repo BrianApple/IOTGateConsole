@@ -9,6 +9,16 @@ IOTGateConsole是IOTGate智能网关的控制台程序，用于查看当前IOTGa
 1. **去除 Zookeeper 依赖**：网关节点发现不再依赖 ZK 注册中心，改为在 `application.properties` 中通过 `gate.nodes` 静态配置网关节点 IP 列表（支持 `ip` 或 `ip:port` 格式，默认 RPC 端口 10916）。
 2. **前端 Vue3 重构 + SSE 实时推送**：原 LayUI/jQuery 静态页面已重构为 Vue3 + Vite 单页应用；前端通过 SSE（`GET /rpc/events`）实时接收网关节点上下线状态、规约变更事件，替代原 ZK 事件监听机制。
 
+### 智能体模式（v2.1 新增）
+规约管理页提供 **🤖 智能体助手**：用户只需粘贴规约的**帧结构描述**（十六进制报文示例、字段说明或文字描述均可），AI 自动推导出网关解码参数（大小端/长度域偏移/长度域长度/长度含长度域标志/额外长度/建议端口等），并支持**一键填充**到新增规约表单。
+
+- 后端接口：`POST /rpc/ai/parse`，基于 DeepSeek 大模型
+- 配置（application.properties 或环境变量）：
+  - `ai.api-key`：DeepSeek API Key（建议通过环境变量 `DEEPSEEK_API_KEY` 注入，勿硬编码提交）
+  - `ai.base-url`：默认 `https://api.deepseek.com`
+  - `ai.model`：默认 `deepseek-chat`
+- 使用示例：在规约管理页点击"🤖 智能体助手"，粘贴如 `68 11 22 33 44 55 66 68 01 02 12 34 56 78 16`（DL/T645电表帧），AI 会返回完整解码参数
+
 ### 环境要求
 jdk1.8、mysql5.5+ 以及 IOTGate 节点
 

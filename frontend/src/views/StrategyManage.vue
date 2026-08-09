@@ -5,6 +5,7 @@
         <div class="card-header">
           <span>规约列表</span>
           <div>
+            <el-button type="success" size="small" @click="showAI = true">🤖 智能体助手</el-button>
             <el-button type="primary" size="small" @click="showAdd = true">新增规约</el-button>
             <el-button size="small" @click="loadData">刷新</el-button>
             <el-tag size="small" type="info" style="margin-left: 8px">
@@ -83,17 +84,22 @@
         <el-button type="primary" :loading="submitting" @click="submitAdd">提交</el-button>
       </template>
     </el-dialog>
+
+    <!-- 智能体模式：规约帧结构AI解析 -->
+    <AIAssistant v-model="showAI" @fill="onAIFill" />
   </div>
 </template>
 
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import AIAssistant from '../components/AIAssistant.vue'
 import { addOneStrategy, delOneStrategyByPID, getAllStrategyAllInfo } from '../api'
 
 const strategies = ref([])
 const loading = ref(false)
 const showAdd = ref(false)
+const showAI = ref(false)
 const submitting = ref(false)
 
 const form = reactive({
@@ -161,6 +167,22 @@ function resetForm() {
     pid: '', straName: '', bigdian: 1, lenOffset: '',
     lenrange: '', lenInfo: 1, leftLen: '', port: ''
   })
+}
+
+// 智能体解析结果填充到新增规约表单
+function onAIFill(aiForm) {
+  showAI.value = false
+  Object.assign(form, {
+    pid: aiForm.pid ?? '',
+    straName: aiForm.straName ?? '',
+    bigdian: aiForm.bigdian ?? 1,
+    lenOffset: aiForm.lenOffset ?? '',
+    lenrange: aiForm.lenrange ?? '',
+    lenInfo: aiForm.lenInfo ?? 1,
+    leftLen: aiForm.leftLen ?? '',
+    port: aiForm.port ?? ''
+  })
+  showAdd.value = true
 }
 
 function handleStrategyChange() {
