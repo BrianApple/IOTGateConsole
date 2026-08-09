@@ -41,6 +41,9 @@
         <router-view />
       </el-main>
     </el-container>
+
+    <!-- 全局悬浮智能体机器人（对话 + 模型设置） -->
+    <FloatingBot />
   </el-container>
 </template>
 
@@ -49,6 +52,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Monitor, Document, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import FloatingBot from '../components/FloatingBot.vue'
 
 const router = useRouter()
 const username = ref('')

@@ -5,7 +5,7 @@
         <div class="card-header">
           <span>规约列表</span>
           <div>
-            <el-button type="success" size="small" @click="showAI = true">🤖 智能体助手</el-button>
+            <el-button type="success" size="small" @click="openAIBot">🤖 智能体助手</el-button>
             <el-button type="primary" size="small" @click="showAdd = true">新增规约</el-button>
             <el-button size="small" @click="loadData">刷新</el-button>
             <el-tag size="small" type="info" style="margin-left: 8px">
@@ -84,22 +84,17 @@
         <el-button type="primary" :loading="submitting" @click="submitAdd">提交</el-button>
       </template>
     </el-dialog>
-
-    <!-- 智能体模式：规约帧结构AI解析 -->
-    <AIAssistant v-model="showAI" @fill="onAIFill" />
   </div>
 </template>
 
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import AIAssistant from '../components/AIAssistant.vue'
 import { addOneStrategy, delOneStrategyByPID, getAllStrategyAllInfo } from '../api'
 
 const strategies = ref([])
 const loading = ref(false)
 const showAdd = ref(false)
-const showAI = ref(false)
 const submitting = ref(false)
 
 const form = reactive({
@@ -169,20 +164,32 @@ function resetForm() {
   })
 }
 
-// 智能体解析结果填充到新增规约表单
-function onAIFill(aiForm) {
-  showAI.value = false
-  Object.assign(form, {
-    pid: aiForm.pid ?? '',
-    straName: aiForm.straName ?? '',
-    bigdian: aiForm.bigdian ?? 1,
-    lenOffset: aiForm.lenOffset ?? '',
-    lenrange: aiForm.lenrange ?? '',
-    lenInfo: aiForm.lenInfo ?? 1,
-    leftLen: aiForm.leftLen ?? '',
-    port: aiForm.port ?? ''
-  })
-  showAdd.value = true
+// 打开右下角悬浮智能体机器人（由 Layout 全局挂载的 FloatingBot 监听）
+function openAIBot() {
+  window.dispatchEvent(new CustomEvent('open-ai-bot'))
+}
+
+// 智能体一键填充：读取悬浮机器人通过 sessionStorage 传递的表单数据
+function applyAIFill() {
+  const fill = sessionStorage.getItem('ai_fill_form')
+  if (!fill) return
+  sessionStorage.removeItem('ai_fill_form')
+  try {
+    const aiForm = JSON.parse(fill)
+    Object.assign(form, {
+      pid: aiForm.pid ?? '',
+      straName: aiForm.straName ?? '',
+      bigdian: aiForm.bigdian ?? 1,
+      lenOffset: aiForm.lenOffset ?? '',
+      lenrange: aiForm.lenrange ?? '',
+      lenInfo: aiForm.lenInfo ?? 1,
+      leftLen: aiForm.leftLen ?? '',
+      port: aiForm.port ?? ''
+    })
+    showAdd.value = true
+  } catch (e) {
+    ElMessage.error('智能体填充数据异常')
+  }
 }
 
 function handleStrategyChange() {
@@ -200,6 +207,7 @@ function unbindSSE() {
 onMounted(() => {
   bindSSE()
   loadData()
+  applyAIFill()
 })
 
 onBeforeUnmount(unbindSSE)

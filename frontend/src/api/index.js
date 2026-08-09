@@ -76,3 +76,13 @@ export function updateStrategyNode(ip, pidList) {
 export function aiParseProtocol(frameDesc) {
   return http.post('/rpc/ai/parse', { frameDesc })
 }
+
+// 获取大模型配置（api-key 脱敏）
+export function getAiConfig() {
+  return http.get('/rpc/ai/config')
+}
+
+// 保存大模型配置（动态生效）
+export function saveAiConfig(data) {
+  return http.post('/rpc/ai/config', data)
+}
