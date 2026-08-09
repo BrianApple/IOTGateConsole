@@ -1,7 +1,6 @@
 package IOTGateConsole.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import IOTGateConsole.databridge.ReqWebData;
 import IOTGateConsole.databridge.RetData;
-import IOTGateConsole.databridge.Strategy;
-import IOTGateConsole.domain.User;
 import IOTGateConsole.service.RpcService;
 import IOTGateConsole.service.TestService1;
 
@@ -33,13 +30,8 @@ public class RpcController {
 	RpcService rpcService;
 	@RequestMapping("/index")
 	public String initPage(){
-//		name,phone,create_time,age
-		User user=new User();
-		user.setName("326");
-		user.setPhone("326");
-		user.setCreate_time(new Date());
-		user.setAge(1);
-		return "index";
+		// 前端已重构为 Vue3 SPA，直接跳转静态页面
+		return "redirect:/static/index.html";
 	}
 	
 	@RequestMapping("/gateData")

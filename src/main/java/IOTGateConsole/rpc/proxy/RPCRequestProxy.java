@@ -39,9 +39,8 @@ public class RPCRequestProxy {
 						requestData.setParamTyps(method.getParameterTypes());
 						requestData.setArgs(args);
 						
-						RemoteClient remoteClient = new RemoteClient();
-						//TODO  改为从zookeeper获取rpc数据
-						ResponseData responseData = remoteClient.start(rpcServerIP, 10916, requestData);
+					RemoteClient remoteClient = new RemoteClient();
+					ResponseData responseData = remoteClient.start(rpcServerIP, 10916, requestData);
 						return responseData;
 					}
 				});

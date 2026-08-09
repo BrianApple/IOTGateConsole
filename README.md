@@ -1,11 +1,23 @@
-
 # IOTGateConsole
 
 ### 介绍
 IOTGateConsole是IOTGate智能网关的控制台程序，用于查看当前IOTGate CLUSTER的运行状态，执行 网关规约解析服务的启动、关闭、重启以及网关多规约策略配置等操作
 
+### 架构变更说明（v2.0）
+本版本对架构做了两项重要调整：
+
+1. **去除 Zookeeper 依赖**：网关节点发现不再依赖 ZK 注册中心，改为在 `application.properties` 中通过 `gate.nodes` 静态配置网关节点 IP 列表（支持 `ip` 或 `ip:port` 格式，默认 RPC 端口 10916）。
+2. **前端 Vue3 重构 + SSE 实时推送**：原 LayUI/jQuery 静态页面已重构为 Vue3 + Vite 单页应用；前端通过 SSE（`GET /rpc/events`）实时接收网关节点上下线状态、规约变更事件，替代原 ZK 事件监听机制。
+
 ### 环境要求
-zookeeper集群环境 、jdk1.8、mysql5.5以及IOTGate节点
+jdk1.8、mysql5.5+ 以及 IOTGate 节点
+
+### 运行方式
+1. 搭建 mysql 服务并导入 `src/main/resources/strategy.sql` 建表
+2. 在 `src/main/resources/application.properties` 中配置数据库参数和 `gate.nodes` 网关节点列表
+3. 执行 `mvn package` 打成可执行 jar 包，启动 jar 包，默认端口为 8686
+4. 访问 http://127.0.0.1:8686/rpc/index 或 http://127.0.0.1:8686/static/index.html ，首次访问会跳转到登录页，用户名密码随意填写（没有存库！）
+5. 前端源码位于 `frontend/` 目录（Vue3 + Vite），如需二次开发：`cd frontend && npm install && npm run dev`（开发模式代理 /rpc 到 8686）；构建产物已集成到 `src/main/resources/static/`
 
 ### GATE CLUSTER 结构图
 ![集群版IOTGate架构](https://images.gitee.com/uploads/images/2019/0402/194105_f06b6623_1038477.png "IOTGate整体架构图.png")
@@ -13,10 +25,15 @@ GATE Console 是一个web工程，用户登录之后可以查看当前GATE CLUST
 
 ### 入口类
 	IotGateConsoleApplication
-### 操作说明
-- 1.首先搭建靠zookeeper集群，开启mysql服务并建立好数据库名称
-- 2.在/IOTGateConsole/src/main/resources/application.properties配置文件中配置数据库参数和zookeeper相关参数
-- 3.将本项目打成一个可执行jar包，启动jar包，默认端口为8686，可以在application.properties中自定义
-- 4.访问地址如：http://127.0.0.1:8686/rpc/index ，第一次f访问会跳转到登录页让输入用户名密码，这个随意填写，没有存库！登录之后便可以发现查看当前zookeeper中注册的网关节点已经当前数据库中的规约信息，如何配置请看:[https://blog.csdn.net/sinat_28771747/article/details/88783309](https://blog.csdn.net/sinat_28771747/article/details/88783309)
+
+### 接口说明
+- `POST /rpc/gateData` 获取所有网关节点信息(含运行规约)
+- `POST /rpc/addOneStrategy` 新增规约(表单格式 data[pid]=xx&data[straName]=xx...)
+- `POST /rpc/getAllStrategeFromDB` 获取所有规约名称与编号
+- `POST /rpc/getAllStrategyAllInfo` 获取所有规约完整信息
+- `POST /rpc/updateStrategyNode` 更新网关节点启用的规约
+- `POST /rpc/delOneStrategyByPID` 删除规约(str=pid)
+- `GET /rpc/events` SSE 事件流(节点状态/规约变更实时推送)
+
 ### 交流群
 - QQ群：844082385
