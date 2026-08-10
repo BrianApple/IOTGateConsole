@@ -8,6 +8,7 @@
         background-color="#1f3b73"
         text-color="#cfd8ea"
         active-text-color="#ffffff"
+        class="side-menu"
       >
         <el-menu-item index="/nodes">
           <el-icon><Monitor /></el-icon>
@@ -18,6 +19,13 @@
           <span>规约管理</span>
         </el-menu-item>
       </el-menu>
+      <div class="sidebar-footer">
+        <BotIcon :size="16" />
+        <div class="ver-meta">
+          <span class="ver-main">AI 智能体版</span>
+          <span class="ver-sub">v2.2</span>
+        </div>
+      </div>
     </el-aside>
 
     <el-container>
@@ -52,6 +60,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Monitor, Document, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import BotIcon from '../components/BotIcon.vue'
 import FloatingBot from '../components/FloatingBot.vue'
 
 const router = useRouter()
@@ -113,7 +122,18 @@ function handleCommand(cmd) {
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
-.aside :deep(.el-menu) { border-right: none; }
+.aside :deep(.el-menu) { border-right: none; flex: 1; }
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  color: #9db4e8;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.ver-meta { display: flex; flex-direction: column; line-height: 1.25; }
+.ver-main { font-size: 12.5px; color: #e8eefc; font-weight: 600; }
+.ver-sub { font-size: 11px; color: #8fa5d8; letter-spacing: 1px; }
 .header {
   background: #fff;
   display: flex;

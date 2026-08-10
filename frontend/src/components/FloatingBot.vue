@@ -16,7 +16,7 @@
           <div class="bot-title">
             <div class="bot-avatar"><BotIcon :size="20" /></div>
             <div class="bot-meta">
-              <div class="bot-name">规约解析智能体</div>
+              <div class="bot-name">规约解析智能体 <span class="bot-ver">v2.2</span></div>
               <div class="bot-status">
                 <span class="dot" :class="{ ok: cfgReady }"></span>
                 {{ cfgReady ? '在线 · ' + cfg.model : '未配置模型' }}
@@ -366,6 +366,16 @@ onBeforeUnmount(() => {
   color: #fff;
 }
 .bot-name { font-size: 15px; font-weight: 600; }
+.bot-ver {
+  font-size: 10.5px;
+  font-weight: 500;
+  opacity: 0.75;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 1px 6px;
+  margin-left: 2px;
+  vertical-align: 1px;
+}
 .bot-status {
   font-size: 11px;
   opacity: 0.9;

@@ -2,7 +2,7 @@
   <div class="login-page">
     <div class="login-card">
       <h1 class="login-title">IOTGate 智能网关</h1>
-      <p class="login-sub">IOTGateConsole 控制台</p>
+      <p class="login-sub">IOTGateConsole · AI 智能体版 v2.2</p>
       <el-form :model="form" @keyup.enter="doLogin">
         <el-form-item>
           <el-input v-model="form.username" placeholder="用户名(随意填写)" size="large" />
