@@ -84,6 +84,13 @@ public class GateNodeRegistry {
 			exist.setRpcPort(info.getRpcPort() > 0 ? info.getRpcPort() : exist.getRpcPort());
 			exist.setGateNum(info.getGateNum());
 			exist.setOnline(true);
+			if (exist.getRegTime() <= 0) {
+				exist.setRegTime(System.currentTimeMillis());
+			}
+		}
+		// 新节点记录注册时间
+		if (isNew) {
+			info.setRegTime(System.currentTimeMillis());
 		}
 		touch(info.getIp());
 		return isNew;

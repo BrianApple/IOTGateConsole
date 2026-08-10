@@ -27,6 +27,9 @@ public class GateNodeInfo implements Serializable {
 	/** 最近一次心跳时间戳(ms) */
 	private long lastHeartbeat;
 
+	/** 注册时间戳(ms)，用于计算在线时长 */
+	private long regTime;
+
 	/** 是否在线 */
 	private boolean online = true;
 
@@ -60,6 +63,14 @@ public class GateNodeInfo implements Serializable {
 
 	public void setLastHeartbeat(long lastHeartbeat) {
 		this.lastHeartbeat = lastHeartbeat;
+	}
+
+	public long getRegTime() {
+		return regTime;
+	}
+
+	public void setRegTime(long regTime) {
+		this.regTime = regTime;
 	}
 
 	public boolean isOnline() {

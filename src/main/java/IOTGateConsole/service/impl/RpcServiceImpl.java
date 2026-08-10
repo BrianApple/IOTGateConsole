@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import IOTGateConsole.chache.CommonLocalCache;
+import IOTGateConsole.config.GateNodeRegistry;
 import IOTGateConsole.dao.IotGateMapper;
+import IOTGateConsole.databridge.GateNodeInfo;
 import IOTGateConsole.databridge.ReqWebData;
 import IOTGateConsole.databridge.ResponseData;
 import IOTGateConsole.databridge.RetData;
@@ -29,6 +31,8 @@ import IOTGateConsole.service.RpcService;
 public class RpcServiceImpl implements RpcService{
 	@Autowired
 	private IotGateMapper iotGateMapper;
+	@Autowired
+	private GateNodeRegistry gateNodeRegistry;
 	@SuppressWarnings("unchecked")
 	@Override
 	public RetData getAllGateInfo() {
@@ -36,9 +40,30 @@ public class RpcServiceImpl implements RpcService{
 		RetData ret = new RetData();
 		List<Object> retData = new ArrayList<Object>();
 		
+		// 注册表快照：ip -> 节点信息（动态注册节点含 gateNum/心跳时间）
+		Map<String, GateNodeInfo> regMap = new HashMap<>();
+		List<GateNodeInfo> regNodes = gateNodeRegistry.snapshot();
+		for (GateNodeInfo info : regNodes) {
+			regMap.put(info.getIp(), info);
+		}
+		
 		for (String ip : allNodes) {
 			Map<String,String> aStrategy = new HashMap<>();
 			aStrategy.put("ip", ip);
+			GateNodeInfo regInfo = regMap.get(ip);
+			if (regInfo != null) {
+				// 动态注册节点：补充注册来源/编号/心跳时间
+				aStrategy.put("source", "dynamic");
+				aStrategy.put("gateNum", String.valueOf(regInfo.getGateNum()));
+				aStrategy.put("lastHeartbeat", String.valueOf(regInfo.getLastHeartbeat()));
+				aStrategy.put("regTime", String.valueOf(regInfo.getRegTime()));
+			} else {
+				// 静态配置节点
+				aStrategy.put("source", "static");
+				aStrategy.put("gateNum", "-");
+				aStrategy.put("lastHeartbeat", "0");
+				aStrategy.put("regTime", "0");
+			}
 			RPCExportService rpcExportService = CommonLocalCache.rpcProxys.get(ip);
 			if(rpcExportService != null){
 				aStrategy.put("stat", "ok");

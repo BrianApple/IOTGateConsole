@@ -14,7 +14,37 @@
       </template>
 
       <el-table :data="nodes" v-loading="loading" stripe style="width: 100%">
+        <el-table-column prop="gateNum" label="编号" width="80">
+          <template #default="{ row }">
+            <span v-if="row.gateNum && row.gateNum !== '-'">{{ row.gateNum }}</span>
+            <span v-else style="color: #bbb">-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="ip" label="节点 IP" min-width="150" />
+        <el-table-column label="注册来源" width="100">
+          <template #default="{ row }">
+            <el-tag v-if="row.source === 'dynamic'" type="success" size="small" effect="plain">
+              动态注册
+            </el-tag>
+            <el-tag v-else type="info" size="small" effect="plain">静态配置</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="最近心跳" width="150">
+          <template #default="{ row }">
+            <span v-if="row.source === 'dynamic' && row.lastHeartbeat > 0">
+              {{ formatTime(row.lastHeartbeat) }}
+            </span>
+            <span v-else style="color: #bbb">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="在线时长" width="110">
+          <template #default="{ row }">
+            <span v-if="row.source === 'dynamic' && row.regTime > 0">
+              {{ formatDuration(row.regTime) }}
+            </span>
+            <span v-else style="color: #bbb">-</span>
+          </template>
+        </el-table-column>
         <el-table-column label="运行规约" min-width="260">
           <template #default="{ row }">
             <span v-if="row.data">{{ row.data }}</span>
@@ -35,18 +65,53 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-button type="primary" size="small" link @click="openStrategyDialog(row)">
+              规约管理
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
+
+    <!-- 规约启停对话框 -->
+    <el-dialog v-model="strategyDialogVisible" title="节点规约管理" width="520px" :close-on-click-modal="false">
+      <el-alert
+        v-if="currentNode"
+        :title="`节点 ${currentNode.ip}（${currentNode.source === 'dynamic' ? '动态注册' : '静态配置'}）`"
+        type="info"
+        :closable="false"
+        show-icon
+        style="margin-bottom: 12px"
+      />
+      <el-checkbox-group v-model="checkedPids">
+        <div v-for="s in allStrategies" :key="s.pid" style="margin-bottom: 8px">
+          <el-checkbox :value="String(s.pid)">{{ s.pName }}（pId={{ s.pid }}）</el-checkbox>
+        </div>
+      </el-checkbox-group>
+      <template #footer>
+        <el-button @click="strategyDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitStrategies">保存启停</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getGateData } from '../api'
+import { getAllStrategeFromDB, getGateData, updateStrategyNode } from '../api'
 
 const nodes = ref([])
 const loading = ref(false)
+
+// 规约启停对话框状态
+const strategyDialogVisible = ref(false)
+const submitting = ref(false)
+const allStrategies = ref([])
+const checkedPids = ref([])
+const currentNode = ref(null)
 
 async function loadData() {
   loading.value = true
@@ -91,6 +156,75 @@ function handleSnapshot(e) {
   for (const n of nodes.value) {
     if (onlineMap.value.has(n.ip)) n.online = onlineMap.value.get(n.ip)
   }
+}
+
+// 解析运行规约字段 "pid:port/ pid:port" -> pid 集合
+function parseRunningPids(dataStr) {
+  if (!dataStr) return []
+  return dataStr
+    .split('/')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => s.split(':')[0])
+}
+
+// 打开规约管理对话框
+async function openStrategyDialog(row) {
+  currentNode.value = row
+  checkedPids.value = parseRunningPids(row.data)
+  try {
+    const data = await getAllStrategeFromDB()
+    if (data.retSig === 200) {
+      // data[0] 为 {规约名: pid} 映射
+      const map = (data.data && data.data[0]) || {}
+      allStrategies.value = Object.entries(map).map(([name, pid]) => ({
+        pName: name,
+        pid
+      }))
+    }
+  } catch (e) {
+    ElMessage.error('获取规约列表失败')
+  }
+  strategyDialogVisible.value = true
+}
+
+// 提交规约启停
+async function submitStrategies() {
+  submitting.value = true
+  try {
+    const data = await updateStrategyNode(currentNode.value.ip, checkedPids.value)
+    if (data.retSig === 200) {
+      ElMessage.success('规约启停已下发')
+      strategyDialogVisible.value = false
+      loadData()
+    } else {
+      ElMessage.error('下发失败：' + (data.erroInfo || data.retSig))
+    }
+  } catch (e) {
+    ElMessage.error('下发失败：' + (e?.message || e))
+  } finally {
+    submitting.value = false
+  }
+}
+
+// 时间戳格式化
+function formatTime(ts) {
+  const d = new Date(Number(ts))
+  const p = (n) => String(n).padStart(2, '0')
+  return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+}
+
+// 在线时长格式化
+function formatDuration(ts) {
+  const diff = Math.max(0, Date.now() - Number(ts))
+  const sec = Math.floor(diff / 1000)
+  if (sec < 60) return `${sec}秒`
+  const min = Math.floor(sec / 60)
+  if (min < 60) return `${min}分钟`
+  const hour = Math.floor(min / 60)
+  if (hour < 24) return `${hour}小时${min % 60}分`
+  const day = Math.floor(hour / 24)
+  return `${day}天${hour % 24}小时`
 }
 
 function bindSSE() {
