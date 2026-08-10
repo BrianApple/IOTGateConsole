@@ -28,6 +28,18 @@ import IOTGateConsole.chache.CommonLocalCache;
  * 定时探测各网关节点 10916 端口的 TCP 连通性，
  * 节点状态发生变化(上线/离线)时通过 SSE 推送给前端。
  *
+ * 在线状态判断逻辑（动态注册节点与静态配置节点完全一致，无差别对待）：
+ * 1. 遍历 CommonLocalCache.rpcServerCache（动态注册 + 静态 gate.nodes 合并后的全量节点列表）
+ * 2. 对每个节点执行 isNodeOnline()：TCP 连接节点 10916 RPC 端口，2s 超时
+ *    - 连接成功 → 在线(online=true)
+ *    - 连接失败/超时 → 离线(online=false)
+ * 3. 状态相对上次缓存发生变化时，通过 SSE node-status 事件实时推送前端
+ *
+ * 注意：静态配置节点虽无心跳上报（前端"最近心跳/在线时长"列为 -），
+ * 但其"在线/离线"状态同样由本服务 TCP 探测得出，是真实探测结果。
+ * 典型场景：静态配置本机 127.0.0.1 且网关进程运行中 → 探测成功显示在线；
+ * 静态配置不存在的 IP（如 192.168.1.99）→ 探测失败一直显示离线。
+ *
  * @author yangcheng
  * @date:   2026年8月9日
  */
