@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>IOTGateConsole</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>2.2.0-RELEASE</version>
 	<name>IOTGateConsole</name>
-	<description>Demo project for Spring Boot</description>
+	<description>IOTGate 智能网关控制台（AI 智能体版 v2.2）</description>
 
 	<properties>
 		<java.version>21</java.version>

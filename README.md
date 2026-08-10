@@ -79,9 +79,15 @@ jdk21（Temurin 21 LTS 及以上）、mysql5.5+ 以及 IOTGate 节点
 
 ### 运行方式
 1. 搭建 mysql 服务并导入 `src/main/resources/strategy.sql` 建表
-2. 在 `src/main/resources/application.properties` 中配置数据库参数和 `gate.nodes` 网关节点列表
-3. 执行 `mvn package` 打成可执行 jar 包，启动 jar 包，默认端口为 8686
-4. 访问 http://127.0.0.1:8686/static/index.html ，首次访问会跳转到登录页，用户名密码随意填写（没有存库！）
+2. 配置数据库连接：默认连接 `127.0.0.1:13306/iotgatedb`，用户名密码通过环境变量注入（**避免明文口令入库**）：
+   ```bash
+   export DB_USERNAME=root
+   export DB_PASSWORD=你的数据库密码
+   ```
+   或直接编辑 `src/main/resources/application.properties` 中的 `spring.datasource.*`
+3. 在 `src/main/resources/application.properties` 中配置 `gate.nodes` 网关节点列表
+4. 执行 `mvn package` 打成可执行 jar 包，启动 jar 包，默认端口为 8686
+5. 访问 http://127.0.0.1:8686/static/index.html ，首次访问会跳转到登录页，用户名密码随意填写（没有存库！）
 
 ![新版登录页](docs/screenshots/login-v2.2-new.png)
 

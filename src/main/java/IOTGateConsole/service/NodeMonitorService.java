@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,13 @@ public class NodeMonitorService {
 
 	private ScheduledExecutorService scheduler;
 
+	/**
+	 * 并行探测线程池（虚拟线程，JDK 21）
+	 * 每个节点一个虚拟线程执行 TCP 探测，避免节点数多时串行探测导致状态刷新滞后
+	 * （串行探测 N 个节点最坏需要 N×2s；并行探测一轮约等于单个节点耗时）
+	 */
+	private final ExecutorService probePool = Executors.newVirtualThreadPerTaskExecutor();
+
 	@PostConstruct
 	public void init() {
 		scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -70,7 +78,7 @@ public class NodeMonitorService {
 			return t;
 		});
 		scheduler.scheduleAtFixedRate(this::monitorNodes, 3, MONITOR_INTERVAL_SECONDS, TimeUnit.SECONDS);
-		log.info("节点状态监控服务已启动，探测周期 {}s", MONITOR_INTERVAL_SECONDS);
+		log.info("节点状态监控服务已启动，探测周期 {}s，并行探测(虚拟线程)已启用", MONITOR_INTERVAL_SECONDS);
 	}
 
 	@PreDestroy
@@ -78,6 +86,7 @@ public class NodeMonitorService {
 		if (scheduler != null) {
 			scheduler.shutdownNow();
 		}
+		probePool.shutdownNow();
 	}
 
 	/**
@@ -99,11 +108,22 @@ public class NodeMonitorService {
 	}
 
 	/**
-	 * 定时探测所有节点状态
+	 * 定时探测所有节点状态（并行，虚拟线程）
+	 * 每个节点提交一个虚拟线程任务独立探测，状态变化即时广播；
+	 * 节点之间互不阻塞，探测一轮总耗时 ≈ 单个节点探测耗时
 	 */
 	private void monitorNodes() {
 		List<String> nodes = CommonLocalCache.rpcServerCache;
 		for (String ip : nodes) {
+			probePool.submit(() -> probeNode(ip));
+		}
+	}
+
+	/**
+	 * 探测单个节点并处理状态变化
+	 */
+	private void probeNode(String ip) {
+		try {
 			boolean online = isNodeOnline(ip);
 			Boolean prev = nodeStatusCache.get(ip);
 			if (prev == null || prev != online) {
@@ -111,6 +131,8 @@ public class NodeMonitorService {
 				log.info("节点状态变化: {} -> {}", ip, online ? "上线" : "离线");
 				broadcastNodeStatus(ip, online);
 			}
+		} catch (Exception e) {
+			log.warn("节点探测异常: {} -> {}", ip, e.getMessage());
 		}
 	}
 
