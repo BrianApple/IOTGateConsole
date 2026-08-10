@@ -4,7 +4,7 @@
     <transition name="fab">
       <div v-if="!open" class="bot-fab" @click="togglePanel">
         <div class="fab-pulse"></div>
-        <div class="fab-icon">🤖</div>
+        <div class="fab-icon"><BotIcon :size="30" /></div>
       </div>
     </transition>
 
@@ -14,7 +14,7 @@
         <!-- 头部 -->
         <div class="bot-header">
           <div class="bot-title">
-            <div class="bot-avatar">🤖</div>
+            <div class="bot-avatar"><BotIcon :size="20" /></div>
             <div class="bot-meta">
               <div class="bot-name">规约解析智能体</div>
               <div class="bot-status">
@@ -41,9 +41,9 @@
         <template v-if="panel === 'chat'">
           <div class="chat-box" ref="chatBox">
             <div class="msg msg-ai">
-              <div class="avatar">🤖</div>
+              <div class="avatar"><BotIcon :size="15" /></div>
               <div class="bubble">
-                你好，我是规约解析智能体 👋<br />
+                你好，我是规约解析智能体<br />
                 粘贴通信协议的<strong>帧结构描述</strong>（字段定义：帧头、各字段字节数、长度域位置与定义、字节序、校验帧尾等），
                 我会提取长度域信息推导出<strong>拆包/黏包解码参数</strong>，并可一键填入新增规约表单。
                 <br /><br />
@@ -52,7 +52,10 @@
             </div>
 
             <div v-for="(m, i) in messages" :key="i" :class="['msg', m.role === 'user' ? 'msg-user' : 'msg-ai']">
-              <div class="avatar">{{ m.role === 'user' ? '👤' : '🤖' }}</div>
+              <div class="avatar">
+                <BotIcon v-if="m.role === 'ai'" :size="15" />
+                <el-icon v-else :size="15"><User /></el-icon>
+              </div>
               <div class="bubble">
                 <pre v-if="m.type === 'json'">{{ prettyJson(m.content) }}</pre>
                 <div v-else>{{ m.content }}</div>
@@ -61,12 +64,12 @@
                     一键填充到新增规约表单
                   </el-button>
                 </div>
-                <div v-else-if="m.filled" class="fill-tip">✅ 已跳转规约管理，表单已填充</div>
+                <div v-else-if="m.filled" class="fill-tip">已跳转规约管理，表单已填充</div>
               </div>
             </div>
 
             <div v-if="loading" class="msg msg-ai">
-              <div class="avatar">🤖</div>
+              <div class="avatar"><BotIcon :size="15" /></div>
               <div class="bubble loading">
                 <span class="dot-anim" v-for="n in 3" :key="n"></span>
               </div>
@@ -95,7 +98,7 @@
         <template v-else>
           <div class="settings-box">
             <div class="settings-tip">
-              💡 支持任意 OpenAI 兼容接口，修改后<strong>立即生效，无需重启</strong>。
+              提示：支持任意 OpenAI 兼容接口，修改后<strong>立即生效，无需重启</strong>。
               常见：DeepSeek <code>api.deepseek.com/v1</code> · 通义 <code>dashscope.aliyuncs.com/compatible-mode/v1</code> · Ollama <code>localhost:11434/v1</code>
             </div>
             <el-form :model="cfg" label-position="top" size="default">
@@ -133,7 +136,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Setting, Close } from '@element-plus/icons-vue'
+import { Setting, Close, User } from '@element-plus/icons-vue'
+import BotIcon from './BotIcon.vue'
 import { aiParseProtocol, getAiConfig, saveAiConfig } from '../api'
 
 const router = useRouter()
@@ -223,10 +227,10 @@ async function send() {
     if (data.retSig === 200) {
       messages.value.push({ role: 'ai', type: 'json', content: JSON.stringify(data.data) })
     } else {
-      messages.value.push({ role: 'ai', content: '❌ ' + (data.error || '解析失败') })
+      messages.value.push({ role: 'ai', content: (data.error || '解析失败') })
     }
   } catch (e) {
-    messages.value.push({ role: 'ai', content: '❌ 请求失败：' + (e.message || '网络错误') })
+    messages.value.push({ role: 'ai', content: '请求失败：' + (e.message || '网络错误') })
   } finally {
     loading.value = false
     scrollBottom()
@@ -267,7 +271,7 @@ function scrollBottom() {
   })
 }
 
-// 规约管理页"🤖 智能体助手"按钮触发展开
+// 规约管理页"智能体助手"按钮触发展开
 function handleOpenBot() {
   open.value = true
   panel.value = 'chat'
@@ -310,7 +314,10 @@ onBeforeUnmount(() => {
   box-shadow: 0 10px 30px rgba(31, 59, 115, 0.55);
 }
 .fab-icon {
-  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 .fab-pulse {
@@ -356,7 +363,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  color: #fff;
 }
 .bot-name { font-size: 15px; font-weight: 600; }
 .bot-status {
@@ -412,7 +419,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  color: #3b6fd4;
   flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }

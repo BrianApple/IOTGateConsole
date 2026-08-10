@@ -5,7 +5,9 @@
         <div class="card-header">
           <span>规约列表</span>
           <div>
-            <el-button type="success" size="small" @click="openAIBot">🤖 智能体助手</el-button>
+            <el-button type="success" size="small" @click="openAIBot">
+              <BotIcon :size="14" style="vertical-align: -2px; margin-right: 4px" /> 智能体助手
+            </el-button>
             <el-button type="primary" size="small" @click="showAdd = true">新增规约</el-button>
             <el-button size="small" @click="loadData">刷新</el-button>
             <el-tag size="small" type="info" style="margin-left: 8px">
@@ -90,6 +92,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import BotIcon from '../components/BotIcon.vue'
 import { addOneStrategy, delOneStrategyByPID, getAllStrategyAllInfo } from '../api'
 
 const strategies = ref([])
