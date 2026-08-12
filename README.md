@@ -1,5 +1,7 @@
 # IOTGateConsole —— IOTGate 智能网关控制台（AI 智能体版）
 
+![IOTGate Logo](iotgate-logo.png)
+
 > IOTGate 智能网关的**管理平台**：实时查看 IOTGate CLUSTER 运行状态，远程执行网关规约解析服务的启动、关闭、重启，以及多规约策略配置；**v2.2 内置 AI 悬浮机器人**，粘贴协议帧结构描述即可自动生成规约配置。
 
 [![文档站](https://img.shields.io/badge/📚%20文档站-BrianApple.github.io-38bdf8)](https://BrianApple.github.io/docs/iotgate-console/intro)
